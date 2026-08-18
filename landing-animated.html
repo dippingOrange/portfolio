@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyProduct — 让开发更简单（动画版）</title>
+    <style>
+        /* ========================================
+           CSS 变量
+           ======================================== */
+        :root {
+            --bg:          #f0f2f5;
+            --card-bg:     #ffffff;
+            --footer-bg:   #1e293b;
+            --primary:     #2563eb;
+            --primary-hover: #1d4ed8;
+            --text:        #1e293b;
+            --text-muted:  #64748b;
+            --border:      #e2e8f0;
+            --radius:      12px;
+            --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:   0 4px 6px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+                         "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* ============================================
+           🎬 动画 1：通用淡入上浮（@keyframes）
+           页面加载时就播放。三个区块分别延迟，逐个出现。
+           ============================================ */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 导航栏 —— 不透明 + 不位移，只淡入 */
+        .navbar {
+            animation: fadeNav 0.6s ease;
+        }
+        @keyframes fadeNav {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        /* ============================================
+           🎬 动画 2：滚动触发显现（Intersection Observer）
+           reveal 初始不可见，JS 监听"元素进入视口"，
+           给它加上 visible 类，transition 过渡到可见。
+           ============================================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 商品卡片逐个出现 —— 延迟递增 */
+        .reveal-delay-0  { transition-delay: 0s; }
+        .reveal-delay-1  { transition-delay: 0.15s; }
+        .reveal-delay-2  { transition-delay: 0.3s; }
+
+        /* ============================================
+           导航栏
+           ============================================ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            padding: 16px 40px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        /* ============================================
+           Hero 区（带入场动画）
+           h1 / p / 按钮 三个元素各自延迟，形成阶梯感
+           ============================================ */
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.2;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.2s forwards;   /* 延迟0.2s */
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.4s forwards;   /* 延迟0.4s */
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.6s forwards;   /* 延迟0.6s */
+        }
+
+        /* ============================================
+           🎬 动画 3：SVG 线条描边动画
+           stroke-dashoffset 让线条"自己画出来"。
+           这个勾号 SVG 放在按钮下面，加载时自动画出。
+           ============================================ */
+        .hero-check {
+            margin-top: 40px;
+            width: 64px;
+            height: 64px;
+        }
+
+        .hero-check circle {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 3;
+            stroke-dasharray: 240;      /* 圆的周长 ≈ 240 */
+            stroke-dashoffset: 240;     /* 初始完全隐藏 */
+            animation: draw 1.5s ease 1s forwards;
+        }
+
+        .hero-check path {
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 50;       /* 勾号的路径长度 ≈ 50 */
+            stroke-dashoffset: 50;
+            animation: draw 0.6s ease 2s forwards;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }   /* 隐藏 → 画出来 */
+        }
+
+        /* ============================================
+           🎬 动画 4：连续动画（无限循环）
+           滚轮指示条 —— 一直上下浮动，提示用户往下滚
+           ============================================ */
+        .scroll-hint {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: var(--text-muted);
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 1.4s forwards;
+        }
+
+        .scroll-hint .mouse {
+            width: 24px;
+            height: 38px;
+            border: 2px solid var(--text-muted);
+            border-radius: 12px;
+            margin: 8px auto 0;
+            position: relative;
+        }
+
+        .scroll-hint .wheel {
+            width: 4px;
+            height: 8px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            margin: 5px auto 0;
+            animation: wheelDown 1.6s ease-in-out infinite;   /* 无限循环 */
+        }
+
+        @keyframes wheelDown {
+            0%   { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(14px); opacity: 0; }  /* 滚轮往下滑走 */
+        }
+
+        /* ============================================
+           🎬 动画 5：3D 翻转卡片（hover 触发）
+           正面图片，hover 后绕 Y 轴翻转 180°，露出背面文字
+           ============================================ */
+        .section-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .products {
+            max-width: 960px;
+            margin: 0 auto 80px;
+            padding: 0 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        /* 3D 翻转容器 */
+        .card {
+            height: 340px;                 /* 固定高度，否则翻转会塌 */
+            perspective: 1000px;           /* 父元素给透视，3D 效果的基础 */
+            cursor: pointer;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;  /* 保留子元素的 3D 位置 */
+            transition: transform 0.7s ease;
+        }
+
+        .card:hover .card-inner {
+            transform: rotateY(180deg);    /* hover：绕 Y 轴翻转 */
+        }
+
+        /* 正面（图片）和背面（文字），各占一个面 */
+        .card-face {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            backface-visibility: hidden;   /* 翻过去的那一面不可见 */
+        }
+
+        .card-front {
+            background: var(--card-bg);
+        }
+
+        .card-front .card-image {
+            width: 100%;
+            height: 200px;
+            background: #e2e8f0;
+        }
+
+        .card-front .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-front .card-caption {
+            padding: 16px 20px;
+        }
+
+        .card-front .card-caption h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-front .card-caption p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* 背面 */
+        .card-back {
+            background: var(--primary);
+            color: white;
+            transform: rotateY(180deg);    /* 背面预翻转，否则文字是镜像的 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .card-back h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .card-back p {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-back .btn-buy {
+            padding: 8px 24px;
+            background: white;
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card-back .btn-buy:hover { transform: scale(1.05); }
+
+        /* ============================================
+           🎬 动画 6：加载进度条（连续动画）
+           顶部一条无限循环的加载条 —— 模拟"持续运行"
+           ============================================ */
+        .loading-bar {
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .loading-bar::after {
+            content: '';
+            display: block;
+            width: 40%;
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            animation: loading 2s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0%   { margin-left: -40%; }
+            100% { margin-left: 100%; }    /* 从左滑到右，再循环 */
+        }
+
+        /* ============================================
+           页脚
+           ============================================ */
+        .footer {
+            background: var(--footer-bg);
+            color: white;
+            padding: 60px 40px 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .footer-col h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover { color: white; }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        /* ========================================
+           响应式
+           ======================================== */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                padding: 12px 16px;
+            }
+            .nav-links {
+                gap: 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🎬 顶部加载条（连续动画） -->
+    <div class="loading-bar"></div>
+
+    <!-- ========== 导航栏 ========== -->
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <!-- SVG 图标：闪电形状 -->
+            <svg viewBox="0 0 24 24" fill="var(--primary)">
+                <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/>
+            </svg>
+            MyProduct
+        </a>
+        <ul class="nav-links">
+            <li><a href="#products">商品</a></li>
+            <li><a href="#about">关于</a></li>
+            <li><a href="#contact">联系</a></li>
+        </ul>
+    </nav>
+
+    <!-- ========== Hero 区（入场动画 + SVG 描边 + 滚轮提示） ========== -->
+    <section class="hero">
+        <h1>让开发更简单</h1>
+        <p>专业的开发工具套件，帮助你更快地构建应用程序。从零到上线，只需几分钟。</p>
+        <div class="hero-buttons">
+            <button class="btn-primary">开始使用</button>
+            <button class="btn-outline">了解更多</button>
+        </div>
+
+        <!-- 🎬 SVG 勾号：加载时线条自己画出来 -->
+        <svg class="hero-check" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38"/>
+            <path d="M32 52 L46 66 L70 38"/>
+        </svg>
+
+        <!-- 🎬 滚轮提示：无限循环下滑 -->
+        <div class="scroll-hint">
+            向下滚动
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 商品卡片区（滚动触发显现） ========== -->
+    <section class="products" id="products">
+        <h2 class="section-title">热门产品</h2>
+        <p class="section-subtitle">精选开发工具，提升你的工作效率</p>
+
+        <div class="products-grid">
+            <!-- 卡片1：reveal + 延迟0 -->
+            <div class="card reveal reveal-delay-0">
+                <div class="card-inner">
+                    <!-- 正面 -->
+                    <div class="card-face card-front">
+                        <div class="card-image">
+                            <img src="https://picsum.photos/id/1/600/400" alt="笔记本电脑" loading="lazy">
+                        </div>
+                        <div class="card-caption">
+                            <h3>MacBook Pro 14英寸</h3>
+                            <p>M4芯片 / 16GB / 1TB</p>
+                        </div>
+                    </div>
+                    <!-- 背面 -->
+                    <div class="card-face card-back">
+                        <h3>¥ 12,999</h3>
+                        <p>专为专业开发者设计，性能强劲，续航持久。</p>
+                        <button class="btn-buy">加入购物车</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片2：reveal + 延迟0.15s -->
+            <div class="card reveal reveal-delay-1">
+                <div class="card-inner">
+                    <div class="card-face card-front">
+                        <div class="card-image">
+                            <img src="https://picsum.photos/id/96/600/400" alt="耳机" loading="lazy">
+                        </div>
+                        <div class="card-caption">
+                            <h3>降噪无线耳机</h3>
+                            <p>ANC降噪 / 30h续航</p>
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <h3>¥ 1,299</h3>
+                        <p>沉浸式降噪体验，长时间佩戴依然舒适。</p>
+                        <button class="btn-buy">加入购物车</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片3：reveal + 延迟0.3s -->
+            <div class="card reveal reveal-delay-2">
+                <div class="card-inner">
+                    <div class="card-face card-front">
+                        <div class="card-image">
+                            <img src="https://picsum.photos/id/20/600/400" alt="键盘" loading="lazy">
+                        </div>
+                        <div class="card-caption">
+                            <h3>机械键盘 87键</h3>
+                            <p>热插拔 / RGB / PBT</p>
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <h3>¥ 499</h3>
+                        <p>Gasket 结构，手感软弹，码字一天也不累。</p>
+                        <button class="btn-buy">加入购物车</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 页脚 ========== -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>产品</h4>
+                <a href="#">功能介绍</a>
+                <a href="#">价格方案</a>
+                <a href="#">更新日志</a>
+                <a href="#">API 文档</a>
+            </div>
+            <div class="footer-col">
+                <h4>公司</h4>
+                <a href="#">关于我们</a>
+                <a href="#">加入团队</a>
+                <a href="#">新闻动态</a>
+                <a href="#">联系我们</a>
+            </div>
+            <div class="footer-col">
+                <h4>资源</h4>
+                <a href="#">帮助中心</a>
+                <a href="#">社区论坛</a>
+                <a href="#">视频教程</a>
+                <a href="#">博客</a>
+            </div>
+            <div class="footer-col">
+                <h4>法律</h4>
+                <a href="#">隐私政策</a>
+                <a href="#">服务条款</a>
+                <a href="#">Cookie 设置</a>
+            </div>
+        </div>
+        <p class="footer-bottom">© 2026 MyProduct. All rights reserved.</p>
+    </footer>
+
+    <!-- ============================================
+         JavaScript：滚动触发显现（Intersection Observer）
+         监听 .reveal 元素，进入视口时加上 visible 类
+         ============================================ -->
+    <script>
+        // 创建观察器：当元素进入视口时触发回调
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {          // 元素进入了可视区域
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);  // 只触发一次，之后不再观察
+                }
+            });
+        }, { threshold: 0.2 });                      // 元素露出 20% 就触发
+
+        // 观察所有带 .reveal 的元素
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+
+</body>
+</html>

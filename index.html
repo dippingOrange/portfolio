@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>郑富彬 · 前端作品集</title>
+    <style>
+        /* ========================================
+           CSS 变量（与 LandingPage 保持同一套设计语言）
+           ======================================== */
+        :root {
+            --bg:          #f0f2f5;
+            --card-bg:     #ffffff;
+            --footer-bg:   #1e293b;
+            --primary:     #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent:      #7c3aed;
+            --text:        #1e293b;
+            --text-muted:  #64748b;
+            --border:      #e2e8f0;
+            --radius:      12px;
+            --radius-lg:   16px;
+            --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:   0 4px 6px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.08);
+            --shadow-lg:   0 10px 20px rgba(0,0,0,0.08), 0 20px 40px rgba(0,0,0,0.10);
+        }
+
+        /* ========================================
+           基础重置
+           ======================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+                         "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* ========================================
+           导航栏
+           ======================================== */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            padding: 16px 40px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .nav-brand {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand .logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+        /* ========================================
+           Hero 区
+           ======================================== */
+        .hero {
+            text-align: center;
+            padding: 88px 24px 64px;
+            background:
+                radial-gradient(600px 240px at 20% 0%, rgba(37,99,235,0.10), transparent),
+                radial-gradient(600px 240px at 80% 0%, rgba(124,58,237,0.10), transparent),
+                var(--bg);
+        }
+
+        .hero-avatar {
+            width: 96px;
+            height: 96px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            font-size: 2.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero h1 {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .hero .hero-title {
+            margin-top: 10px;
+            font-size: 1.15rem;
+            color: var(--text-muted);
+        }
+
+        .hero-bio {
+            max-width: 560px;
+            margin: 18px auto 0;
+            color: var(--text-muted);
+            font-size: 0.98rem;
+        }
+
+        .hero-actions {
+            margin-top: 28px;
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+
+        .btn-outline:hover { background: rgba(37,99,235,0.06); }
+
+        /* 技能标签 */
+        .skills {
+            margin-top: 34px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .skill-tag {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .skill-tag:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ========================================
+           作品区
+           ======================================== */
+        .section {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 56px 24px;
+        }
+
+        .section-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .section-sub {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: transform 0.25s, box-shadow 0.25s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-preview {
+            height: 150px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 2rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* 每个卡片用不同的渐变背景作区分 */
+        .card:nth-child(1) .card-preview { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+        .card:nth-child(2) .card-preview { background: linear-gradient(135deg, #059669, #2563eb); }
+        .card:nth-child(3) .card-preview { background: linear-gradient(135deg, #ea580c, #dc2626); }
+        .card:nth-child(4) .card-preview { background: linear-gradient(135deg, #7c3aed, #db2777); }
+        .card:nth-child(5) .card-preview { background: linear-gradient(135deg, #0d9488, #2563eb); }
+        .card:nth-child(6) .card-preview { background: linear-gradient(135deg, #dc2626, #f59e0b); }
+        .card:nth-child(7) .card-preview { background: linear-gradient(135deg, #4f46e5, #0ea5e9); }
+        .card:nth-child(8) .card-preview { background: linear-gradient(135deg, #059669, #84cc16); }
+
+        .card-body {
+            padding: 20px 22px 22px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 1.08rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .card-tags {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .card-tags span {
+            font-size: 0.78rem;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-weight: 500;
+        }
+
+        .card-link {
+            margin-top: 16px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .card-link:hover { color: var(--primary-hover); }
+
+        /* ========================================
+           页脚
+           ======================================== */
+        footer {
+            background: var(--footer-bg);
+            color: #cbd5e1;
+            text-align: center;
+            padding: 36px 24px;
+            margin-top: 24px;
+        }
+
+        footer p { font-size: 0.9rem; }
+
+        footer a {
+            color: #93c5fd;
+            font-weight: 500;
+        }
+
+        footer a:hover { text-decoration: underline; }
+
+        /* ========================================
+           响应式
+           ======================================== */
+        @media (max-width: 640px) {
+            .navbar { padding: 14px 20px; }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2rem; }
+            .hero { padding: 64px 20px 48px; }
+            .section { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">郑</span>
+            <span>郑富彬</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#works">作品</a></li>
+            <li><a href="https://github.com/dippingOrange" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a class="btn" href="https://github.com/dippingOrange/portfolio" target="_blank" rel="noopener">查看源码</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero 区 -->
+    <header class="hero">
+        <div class="hero-avatar">郑</div>
+        <h1>郑富彬</h1>
+        <p class="hero-title">前端开发工程师 · Python 后端爱好者</p>
+        <p class="hero-bio">
+            热爱用代码构建优雅的用户界面。
+            擅长 Python 后端与前端技术的结合，致力于写出可维护、好看且好用的产品。
+        </p>
+        <div class="hero-actions">
+            <a class="btn" href="#works">浏览作品</a>
+            <a class="btn btn-outline" href="https://github.com/dippingOrange" target="_blank" rel="noopener">GitHub 主页</a>
+        </div>
+
+        <!-- 技能标签 -->
+        <div class="skills">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">FastAPI</span>
+            <span class="skill-tag">HTML &amp; CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Vue.js</span>
+            <span class="skill-tag">MySQL</span>
+            <span class="skill-tag">机器学习</span>
+        </div>
+    </header>
+
+    <!-- 作品区 -->
+    <main class="section" id="works">
+        <h2 class="section-title">前端作品</h2>
+        <p class="section-sub">以下页面均为纯 HTML / CSS 手写练习，点击卡片可直接在线预览</p>
+
+        <div class="grid">
+
+            <article class="card">
+                <a class="card-preview" href="landing-animated.html">动画版</a>
+                <div class="card-body">
+                    <h3 class="card-title">Landing Page · 动画版</h3>
+                    <p class="card-desc">完整的落地页，加入了滚动入场、悬停动效与缓动细节，是我目前最完整的作品。</p>
+                    <div class="card-tags"><span>HTML</span><span>CSS</span><span>动画</span></div>
+                    <a class="card-link" href="landing-animated.html">在线预览 →</a>
+                </div>
+            </article>
+
+            <article class="card">
+                <a class="card-preview" href="landing.html">Landing</a>
+                <div class="card-body">
+                    <h3 class="card-title">Landing Page · 基础版</h3>
+                    <p class="card-desc">导航栏、Hero、特性区、商品卡片、页脚一体的完整落地页，布局与视觉规范的基础版本。</p>
+                    <div class="card-tags"><span>HTML</span><span>CSS</span><span>Flexbox</span></div>
+                    <a class="card-link" href="landing.html">在线预览 →</a>
+                </div>
+            </article>
+
+            <article class="card">
+                <a class="card-preview" href="business-card.html">名片</a>
+                <div class="card-body">
+                    <h3 class="card-title">个人名片</h3>
+                    <p class="card-desc">用 Flexbox 布局制作的个人名片，包含头像、简介与技能标签的排版练习。</p>
+                    <div class="card-tags"><span>HTML</span><span>CSS</span><span>Flexbox</span></div>
+                    <a class="card-link" href="business-card.html">在线预览 →</a>
+                </div>
+            </article>
+
+            <article class="card">
+                <a class="card-preview" href="product-card.html">商品卡</a>
+                <div class="card-body">
+                    <h3 class="card-title">商品卡片</h3>
+                    <p class="card-desc">电商风格的商品卡片，练习图片处理、评分、价格与按钮的细节排版。</p>
+                    <div class="card-tags"><span>HTML</span><span>CSS</span><span>卡片</span></div>
+                    <a class="card-link" href="product-card.html">在线预览 →</a>
+                </div>
+            </article>
+
+            <article class="card">
+                <a class="card-preview" href="css-animations.html">动画</a>
+                <div class="card-body">
+                    <h3 class="card-title">CSS 动画入门</h3>
+                    <p class="card-desc">transform / transition / animation 关键帧动画的练习集，悬停与循环动效演示。</p>
+                    <div class="card-tags"><span>CSS</span><span>动画</span></div>
+                    <a class="card-link" href="css-animations.html">在线预览 →</a>
+                </div>
+            </article>
+
+            <article class="card">
+                <a class="card-preview" href="navbar.html">导航栏</a>
+                <div class="card-body">
+                    <h3 class="card-title">导航栏</h3>
+                    <p class="card-desc">吸顶导航 + 商品卡片的组合练习，包含 hover 交互与基础响应式。</p>
+                    <div class="card-tags"><span>HTML</span><span>CSS</span><span>导航</span></div>
+                    <a class="card-link" href="navbar.html">在线预览 →</a>
+                </div>
+            </article>
+
+            <article class="card">
+                <a class="card-preview" href="hero.html">Hero</a>
+                <div class="card-body">
+                    <h3 class="card-title">Hero 区</h3>
+                    <p class="card-desc">页面首屏 Hero 区的排版练习：大标题、副标题、按钮与背景层次。</p>
+                    <div class="card-tags"><span>HTML</span><span>CSS</span><span>Hero</span></div>
+                    <a class="card-link" href="hero.html">在线预览 →</a>
+                </div>
+            </article>
+
+            <article class="card">
+                <a class="card-preview" href="footer.html">页脚</a>
+                <div class="card-body">
+                    <h3 class="card-title">页脚 Footer</h3>
+                    <p class="card-desc">多栏页脚布局练习，包含链接分组、版权信息与社交入口。</p>
+                    <div class="card-tags"><span>HTML</span><span>CSS</span><span>Footer</span></div>
+                    <a class="card-link" href="footer.html">在线预览 →</a>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>© 2026 郑富彬 · 用 <a href="https://github.com/dippingOrange/portfolio" target="_blank" rel="noopener">HTML &amp; CSS</a> 手写 · 托管于 GitHub Pages</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页脚 Footer</title>
+    <style>
+        :root {
+            --bg:        #f0f2f5;
+            --footer-bg: #1e293b;
+            --primary:   #2563eb;
+            --text:      #1e293b;
+            --text-muted:#94a3b8;
+            --border:    #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+                         "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 占位内容，把 footer 推到底部 */
+        .placeholder {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        /* ========================================
+           Footer
+           四列链接 + 底部分割线 + 版权行
+           ======================================== */
+        .footer {
+            background: var(--footer-bg);
+            color: white;
+            padding: 60px 40px 30px;
+        }
+
+        /* 链接列容器 —— Grid 四列 */
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);    /* 四列等宽 */
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;                            /* 水平居中 */
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);    /* 底部分割线 */
+        }
+
+        /* 每一列 */
+        .footer-col h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col a {
+            display: block;               /* 每个链接独占一行 */
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: color 0.2s ease;
+        }
+
+        .footer-col a:hover {
+            color: white;
+        }
+
+        /* 版权行 */
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 640px) {
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);   /* 手机：两列 */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 占位文字，模拟页面内容，把 footer 推到底部 -->
+    <div class="placeholder">↑ 页面内容区 ↑</div>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <!-- 第1列 -->
+            <div class="footer-col">
+                <h4>产品</h4>
+                <a href="#">功能介绍</a>
+                <a href="#">价格方案</a>
+                <a href="#">更新日志</a>
+                <a href="#">API 文档</a>
+            </div>
+            <!-- 第2列 -->
+            <div class="footer-col">
+                <h4>公司</h4>
+                <a href="#">关于我们</a>
+                <a href="#">加入团队</a>
+                <a href="#">新闻动态</a>
+                <a href="#">联系我们</a>
+            </div>
+            <!-- 第3列 -->
+            <div class="footer-col">
+                <h4>资源</h4>
+                <a href="#">帮助中心</a>
+                <a href="#">社区论坛</a>
+                <a href="#">视频教程</a>
+                <a href="#">博客</a>
+            </div>
+            <!-- 第4列 -->
+            <div class="footer-col">
+                <h4>法律</h4>
+                <a href="#">隐私政策</a>
+                <a href="#">服务条款</a>
+                <a href="#">Cookie 设置</a>
+            </div>
+        </div>
+
+        <p class="footer-bottom">© 2026 MyCompany. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

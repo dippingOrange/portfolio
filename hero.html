@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero 区</title>
+    <style>
+        :root {
+            --bg:        #f0f2f5;
+            --primary:   #2563eb;
+            --primary-hover: #1d4ed8;
+            --text:      #1e293b;
+            --text-muted:#64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+                         "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        /* ========================================
+           Hero 区
+           整个 Hero 就是一个大 div，内部用 Flexbox 居中
+           ======================================== */
+        .hero {
+            /* 占满整个屏幕高度 */
+            min-height: 80vh;
+
+            /* Flexbox 居中 —— 和 body 居中是同一招 */
+            display: flex;
+            flex-direction: column;   /* ← 纵向排列（标题在上，按钮在下）*/
+            justify-content: center;   /* 垂直居中 */
+            align-items: center;       /* 水平居中 */
+            text-align: center;        /* 文字本身也居中 */
+            padding: 40px 20px;
+        }
+
+        /* 主标题 */
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);  /* 流式字号：最小2rem，最大3.5rem */
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        /* 副标题 */
+        .hero p {
+            font-size: 1.125rem;       /* = 18px */
+            color: var(--text-muted);
+            max-width: 500px;           /* 限制行宽，太长不好看 */
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .hero h3 {
+            font-size: 1.125rem;       /* = 18px */
+            color: var(--text-muted);
+            max-width: 500px;           /* 限制行宽，太长不好看 */
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* 按钮组（两个按钮并排） */
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* 主按钮（实心） */
+        .btn-primary {
+            padding: 12px 28px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* 次按钮（空心） —— 新东西！ */
+        .btn-outline {
+            padding: 12px 28px;
+            background: transparent;                 /* 透明背景 */
+            color: var(--primary);
+            border: 2px solid var(--primary);        /* 边框就是颜色 */
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <h1>让开发更简单</h1>
+        <p>
+            专业的开发工具套件，帮助你更快地构建应用程序。
+            从零到上线，只需几分钟。
+        </p>
+        <h3>让我们开始?</h3>
+        <div class="hero-buttons">
+            <button class="btn-primary">开始使用</button>
+            <button class="btn-outline">了解更多</button>
+        </div>
+    </div>
+
+</body>
+</html>

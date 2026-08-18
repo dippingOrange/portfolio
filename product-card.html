@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品卡片</title>
+    <style>
+        /* ========================================
+           第一步：CSS 变量（老朋友了）
+           ======================================== */
+        :root {
+            --bg:          #f0f2f5;
+            --card-bg:     #ffffff;
+            --primary:     #2563eb;
+            --primary-hover: #1d4ed8;
+            --text:        #1e293b;
+            --text-muted:  #64748b;
+            --border:      #e2e8f0;
+            --radius:      12px;
+            --shadow-sm:   0 1px 3px rgba(0,0,0,0.06),
+                           0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:   0 4px 6px rgba(0,0,0,0.05),
+                           0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        /* ========================================
+           第二步：基础重置
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+
+            /* 居中（四件套） */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+
+            padding: 40px 20px;  /* 屏幕很窄时卡片不贴边缘 */
+        }
+
+        /* ========================================
+           第三步：Grid 容器 —— 今天的新东西
+           ======================================== */
+        .container {
+            display: grid;
+
+            /*
+              核心魔法：
+              repeat(3, 1fr) = 三列，每列等宽
+              1fr = "一份可用空间"，三列各占 1/3
+
+              对比 Flexbox：
+              Flexbox 是一维的（要么行要么列）
+              Grid 是二维的（同时控制行和列）
+            */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;                 /* 卡片之间的间距 */
+            max-width: 960px;
+            width: 100%;
+        }
+
+        /* ========================================
+           第四步：卡片
+           和你的名片 .card 几乎一模一样
+           ======================================== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+
+            /*
+              让卡片内部内容排成一列
+              overflow: hidden 让图片的圆角随卡片一起裁剪
+            */
+            overflow: hidden;
+
+            /*
+              hover 过渡 —— 卡片整体的动画
+            */
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);   /* 整个卡片上飘 */
+            box-shadow: var(--shadow-md);  /* 阴影加深 */
+        }
+
+        /* ========================================
+           第五步：图片区域
+           新知识：object-fit
+           ======================================== */
+        .card-image {
+            width: 100%;
+            height: 200px;           /* 固定高度，所有卡片图片区等高 */
+            background: #e2e8f0;     /* 图片加载前的占位色 */
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            /*
+              关键属性：object-fit
+              cover = 填满容器，裁掉多余部分（保持比例）
+              contain = 完整显示图片，可能留白
+              fill    = 拉伸填满（会变形，一般不推荐）
+
+              你用 cover，图片怎么给都不会变形
+            */
+            object-fit: cover;
+            display: block;  /* 消除 img 底部 3px 的默认空隙 */
+        }
+
+        /* ========================================
+           第六步：文字内容区
+           ======================================== */
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-category {
+            font-size: 12px;
+            color: var(--primary);
+            text-transform: uppercase;  /* 全大写 */
+            letter-spacing: 1px;         /* 字母间距 */
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        /* ========================================
+           第七步：价格 + 按钮行（Flexbox 左右分布）
+           ======================================== */
+        .card-footer {
+            display: flex;
+            justify-content: space-between;  /* 两端对齐：价格左，按钮右 */
+            align-items: center;
+        }
+
+        .card-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .card-price .symbol {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .btn-buy {
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+
+            transition: all 0.2s ease;
+        }
+
+        .btn-buy:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-buy:active {
+            transform: translateY(0);
+        }
+
+        /* ========================================
+           第八步：响应式 —— 手机和平板
+           ======================================== */
+        @media (max-width: 768px) {
+            .container {
+                /* 平板：两列 */
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                /* 手机：一列 */
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ========== 卡片 1 ========== -->
+        <div class="card">
+            <!-- 图片区域 -->
+            <div class="card-image">
+                <img
+                    src="https://picsum.photos/id/1/600/400"
+                    alt="笔记本电脑"
+                    loading="lazy"
+                >
+            </div>
+            <!-- 文字区域 -->
+            <div class="card-body">
+                <p class="card-category">电子产品</p>
+                <h3 class="card-title">MacBook Pro 14英寸</h3>
+                <p class="card-description">
+                    M3 芯片 / 8GB 内存 / 512GB 存储，适合专业开发使用。
+                </p>
+                <div class="card-footer">
+                    <span class="card-price">
+                        <span class="symbol">¥</span> 12,999
+                    </span>
+                    <button class="btn-buy">加入购物车</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 卡片 2 ========== -->
+        <div class="card">
+            <div class="card-image">
+                <img
+                    src="https://picsum.photos/id/96/600/400"
+                    alt="耳机"
+                    loading="lazy"
+                >
+            </div>
+            <div class="card-body">
+                <p class="card-category">音频设备</p>
+                <h3 class="card-title">降噪无线耳机</h3>
+                <p class="card-description">
+                    ANC 主动降噪 / 30 小时续航 / Hi-Res 音质认证。
+                </p>
+                <div class="card-footer">
+                    <span class="card-price">
+                        <span class="symbol">¥</span> 1,299
+                    </span>
+                    <button class="btn-buy">加入购物车</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== 卡片 3 ========== -->
+        <div class="card">
+            <div class="card-image">
+                <img
+                    src="https://picsum.photos/id/20/600/400"
+                    alt="机械键盘"
+                    loading="lazy"
+                >
+            </div>
+            <div class="card-body">
+                <p class="card-category">电脑外设</p>
+                <h3 class="card-title">机械键盘 87键</h3>
+                <p class="card-description">
+                    热插拔轴体 / RGB 背光 / PBT 键帽，打字手感极佳。
+                </p>
+                <div class="card-footer">
+                    <span class="card-price">
+                        <span class="symbol">¥</span> 499
+                    </span>
+                    <button class="btn-buy">加入购物车</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

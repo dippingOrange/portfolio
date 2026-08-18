@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root{
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #5c38df;
+            --text: #000000;
+            --text-muted: #b3b2b2;
+            --border: #dfdfdf;
+            --radius: 12px;
+            --shadow-sm:   0 1px 3px 0 rgba(0,0,0,0.06),
+                           0 1px 2px 0 rgba(0,0,0,0.04);
+            --shadow-md:   0 4px 6px 0 rgba(0,0,0,0.05),
+                           0 10px 30px 0 rgba(0,0,0,0.08);
+        }
+
+        /*
+        基础设置
+        */
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+            "Helvetica Neue", Arial, "Noto Sans SC",sans-serif;
+            background:var(--bg);
+            color:var(--text);
+
+            /*居中四件套*/
+            /*display: flex
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            */
+            /*padding: 40px 20px; 屏幕很窄时卡片不贴边缘*/
+        }
+
+        /*Grid容器*/
+        .container {
+            display: grid;
+            /*
+              核心魔法：
+              repeat(3, 1fr) = 三列，每列等宽
+              1fr = "一份可用空间"，三列各占 1/3
+
+              对比 Flexbox：
+              Flexbox 是一维的（要么行要么列）
+              Grid 是二维的（同时控制行和列）
+            */
+            grid-template-columns: repeat(3,1fr);
+            gap: 24px;
+            max-width: 960px;
+            width: 100%;
+            margin: 40px auto 0; /*上40px，左右auto=水平居中，下0*/
+        }
+
+        /*
+        卡片
+        */
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            /*
+            让卡片内容排成一列
+            overflow:hidden 让图片的圆角随卡片一起裁剪
+            */
+            overflow: hidden;
+
+            /*
+             hover过渡——卡片整体的动画
+            */
+            transition:transform 0.25s ease,box-shadow 0.25s ease;
+
+        }
+
+        .card:hover {
+            transform: translateY(-6px); /*整个卡片上飘*/
+            box-shadow: var(--shadow-md);/*阴影加深*/
+        }
+
+        /*图片区域*/
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: #f0f2f5;/*图片加载前的占位色*/
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            /*
+              关键属性：object-fit
+              cover = 填满容器，裁掉多余部分（保持比例）
+              contain = 完整显示图片，可能留白
+              fill    = 拉伸填满（会变形，一般不推荐）
+
+              你用 cover，图片怎么给都不会变形
+            */
+            object-fit: cover;
+            display: block; /*消除 img 底部 3px的默认空隙*/
+
+        }
+
+        /*
+            文字内容区
+            */
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-category {
+            font-size: 12px;
+            color: var(--primary);
+            text-transform: uppercase; /*全大写*/
+            letter-spacing: 1px; /*字母间距*/
+            font-weight: 600;
+            margin-bottom: 6px;
+
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color:var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        /*
+        价格+按钮行 Flexbox左右分布
+        */
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between; /*两端对齐：价格左，按钮右*/
+            align-items: center;
+        }
+
+        .card-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .card-price .symbol {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .btn-buy {
+            padding:  8px 20px;
+            background: var(--primary);
+            color: #f0f2f5;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+
+            transition: all 0.2s ease;
+        }
+
+        .btn-buy:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+        }
+
+        .btn-buy:active {
+            transform: translateY(0);
+        }
+
+        /*响应式——手机和平板*/
+        @media (max-width :768px) {
+            .container{
+                /*平板：两列*/
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                /*手机，一列*/
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /*新知识*/
+        .navbar {
+            position: sticky;    /* ← 新：粘在视口 */
+            top: 0;              /* ← 新：粘在顶部，距顶部 0px */
+            z-index: 100;        /* ← 新：层级，保证不被其他元素挡住 */
+
+            display: flex;
+            /*justify-content: space-between;   ← 旧：左 Logo 右菜单 */
+            gap: 40px;
+            align-items: center;
+            /* ...背景、padding、阴影 都是旧的 */
+
+            /* 补上皮肤 ↓ */
+            background: var(--card-bg);     /* 白色背景 */
+            padding: 16px 40px;             /* 上下16px 左右40px */
+            box-shadow: var(--shadow-sm);   /* 底部微阴影 */
+        }
+
+        .nav-links {
+            display: flex;       /* ← 旧：菜单项排成一行 */
+            gap: 24px;           /* ← 旧 */
+            list-style: none;    /* ← 新：去掉 ul 前面的圆点 */
+        }
+
+        .nav-links a {
+            text-decoration: none;           /* 去掉下划线 */
+            color: var(--text);              /* 用正文颜色代替蓝色 */
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);           /* 鼠标悬停变主题色 */
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+
+    </style>
+</head>
+<body>
+    <nav class="navbar">         <!--← nav 是语义标签（就是 div 但表示导航）-->
+        <a href="#" class="logo">Logo</a>    <!--← a 标签 = 链接-->
+         <ul class="nav-links">      <!--← ul = 无序列表-->
+            <li><a href="#">首页</a></li>
+            <li><a href="#">商品</a></li>
+            <li><a href="#">关于</a></li>
+            <li><a href="#">联系</a></li>
+         </ul>
+    </nav>
+   
+    
+    <div class="container">
+
+            <!--卡片1--->
+            <div class="card">
+                <!--图片区域-->
+                <div class="card-image">
+                    <img
+                        src="https://picsum.photos/id/1/600/400"
+                        alt="笔记本电脑"
+                        loading="lazy"
+                    >
+                </div>
+                <!--文字区域-->
+                <div class="card-body">
+                    <p class="card-category">电子产品</p>
+                    <h3 class="card-title">MacBook pro 14英寸</h3>
+                    <p class="card-description">
+                        M4芯片 / 16GB内存 / 1TB存储，适合专业开发者
+                    </p>
+                    <div class="card-footer">
+                        <span class="card-price">
+                            <span class="symbol">$</span> 799
+                        </span>
+                        <button class="btn-buy">加入购物车</button>
+                    </div>
+                </div>
+            </div>
+        
+            <!--卡片2--->
+            <div class="card">
+                <!--图片区域-->
+                <div class="card-image">
+                    <img
+                        src="https://picsum.photos/id/96/600/400"
+                        alt="耳机"
+                        loading="lazy"
+                    >
+                </div>
+                <!--文字区域-->
+                <div class="card-body">
+                    <p class="card-category">音频设备</p>
+                    <h3 class="card-title">降噪耳机</h3>
+                    <p class="card-description">
+                        主动降噪 / 50小时续航 / Hi-Res高质量音频
+                    </p>
+                    <div class="card-footer">
+                        <span class="card-price">
+                            <span class="symbol">$</span> 399
+                        </span>
+                        <button class="btn-buy">加入购物车</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!--卡片3--->
+            <div class="card">
+                <!--图片区域-->
+                <div class="card-image">
+                    <img
+                        src="https://picsum.photos/id/20/600/400"
+                        alt="键盘"
+                        loading="lazy"
+                    >
+                </div>
+                <!--文字区域-->
+                <div class="card-body">
+                    <p class="card-category">电脑外设</p>
+                    <h3 class="card-title">机械键盘 87键</h3>
+                    <p class="card-description">
+                        热插拔轴体 / RGB背光 / PBT键帽 / 蓝牙链接
+                    </p>
+                    <div class="card-footer">
+                        <span class="card-price">
+                            <span class="symbol">$</span> 599
+                        </span>
+                        <button class="btn-buy">加入购物车</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+</body>
+</html>

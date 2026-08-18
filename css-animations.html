@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS 动画入门</title>
+    <style>
+        :root {
+            --bg:        #f0f2f5;
+            --card-bg:   #ffffff;
+            --primary:   #2563eb;
+            --text:      #1e293b;
+            --text-muted:#64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+                         "Noto Sans SC", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 60px 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 60px 0 24px;
+            font-size: 24px;
+        }
+
+        h2:first-child { margin-top: 0; }
+
+        .demo-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .demo-box {
+            width: 150px;
+            height: 150px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* ========================================
+           动画一：淡入 (fadeIn)
+           从透明 → 不透明
+           ======================================== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .anim-fadeIn {
+            animation: fadeIn 0.8s ease;
+        }
+
+        /* ========================================
+           动画二：脉冲 (pulse)
+           反复放大缩小 —— 像心跳
+           ======================================== */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }  /*动画使用时间轴的概念，0%是起点，100%是终点，这一行的意思是起点与终点时大小比例都为1*/
+            10%      { transform: scale(1.20); } /* 用10%的时间扩大到1.2倍数*/
+        }
+
+        .anim-pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* ========================================
+           动画三：弹入 (bounceIn)
+           从上方弹进来
+           ======================================== */
+        @keyframes bounceIn {
+            0%   { opacity: 0; transform: scale(0.3); }
+            50%  { opacity: 1; transform: scale(1.05); }
+            70%  { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        .anim-bounceIn {
+            animation: bounceIn 0.6s ease;
+        }
+
+        /* ========================================
+           动画四：旋转 (spin)
+           一直转圈
+           ======================================== */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .anim-spin {
+            animation: spin 3s linear infinite;
+        }
+
+        /* ========================================
+           动画五：摇晃 (shake)
+           左右晃动 —— 表示"错了"
+           ======================================== */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-8px); }
+            40%      { transform: translateX(8px); }
+            60%      { transform: translateX(-6px); }
+            80%      { transform: translateX(6px); }
+        }
+
+        .anim-shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* ========================================
+           动画六：滑入 (slideIn)
+           从右边滑进来
+           ======================================== */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(60px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .anim-slideIn {
+            animation: slideIn 0.5s ease;
+        }
+
+        /* ========================================
+           动画七：延迟播放 —— 卡片逐个出现
+           ======================================== */
+        .stagger-demo {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .stagger-box {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* 每个方块延迟不同 —— 逐个出现 */
+        .stagger-box:nth-child(1) { animation-delay: 0s; }
+        .stagger-box:nth-child(2) { animation-delay: 0.1s; }
+        .stagger-box:nth-child(3) { animation-delay: 0.2s; }
+        .stagger-box:nth-child(4) { animation-delay: 0.3s; }
+        .stagger-box:nth-child(5) { animation-delay: 0.4s; }
+        .stagger-box:nth-child(6) { animation-delay: 0.5s; }
+
+        /* ========================================
+           动画八：hover 触发动画
+           鼠标放上去才播放
+           ======================================== */
+        .hover-box {
+            transition: all 0.3s ease;
+        }
+
+        .hover-box:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 30px rgba(37,99,235,0.25);
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ========================================
+           说明文字
+           ======================================== */
+        .note {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 12px 0 0;
+        }
+
+        /* 重置按钮 */
+        .reset-btn {
+            display: block;
+            margin: 50px auto 0;
+            padding: 10px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 1. 淡入 ===== -->
+    <h2>① 淡入上浮 → 刷新页面看效果</h2>
+    <div class="demo-row">
+        <div class="demo-box anim-fadeIn">fadeIn</div>
+    </div>
+    <p class="note">opacity: 0 → 1，同时 translateY(20px) → 0</p>
+
+    <!-- ===== 2. 脉冲（无限循环） ===== -->
+    <h2>② 脉冲（一直跳）</h2>
+    <div class="demo-row">
+        <div class="demo-box anim-pulse">pulse</div>
+    </div>
+    <p class="note">infinite = 无限循环，像心跳一样</p>
+
+    <!-- ===== 3. 弹入 → 刷新页面看效果 ===== -->
+    <h2>③ 弹入效果 → 刷新页面看效果</h2>
+    <div class="demo-row">
+        <div class="demo-box anim-bounceIn">bounceIn</div>
+    </div>
+    <p class="note">先弹过头，再回弹，最后落位</p>
+
+    <!-- ===== 4. 旋转 ===== -->
+    <h2>④ 旋转</h2>
+    <div class="demo-row">
+        <div class="demo-box anim-spin">spin</div>
+    </div>
+    <p class="note">rotate(0deg) → rotate(360deg)，一直转</p>
+
+    <!-- ===== 5. 摇晃（点击触发） ===== -->
+    <h2>⑤ 摇晃 —— 点我试试</h2>
+    <div class="demo-row">
+        <div class="demo-box" onclick="this.classList.add('anim-shake'); setTimeout(() => this.classList.remove('anim-shake'), 500)">
+            点我
+        </div>
+    </div>
+    <p class="note">点击触发，摇完自动停（0.5秒）</p>
+
+    <!-- ===== 6. 滑入 ===== -->
+    <h2>⑥ 从右侧滑入 → 刷新页面看效果</h2>
+    <div class="demo-row">
+        <div class="demo-box anim-slideIn">slideIn</div>
+    </div>
+
+    <!-- ===== 7. 逐个出现（stagger） ===== -->
+    <h2>⑦ 延迟逐个出现 → 刷新页面看效果</h2>
+    <div class="stagger-demo">
+        <div class="stagger-box">1</div>
+        <div class="stagger-box">2</div>
+        <div class="stagger-box">3</div>
+        <div class="stagger-box">4</div>
+        <div class="stagger-box">5</div>
+        <div class="stagger-box">6</div>
+    </div>
+    <p class="note">animation-delay 不同 → 逐个弹出来</p>
+
+    <!-- ===== 8. hover 触发 ===== -->
+    <h2>⑧ 鼠标悬停触发（不用 @keyframes）</h2>
+    <div class="demo-row">
+        <div class="demo-box hover-box">放上来</div>
+    </div>
+    <p class="note">transition 就够了，不需要 @keyframes</p>
+
+    <!-- 刷新按钮 -->
+    <button class="reset-btn" onclick="location.reload()">刷新页面，重播所有动画</button>
+
+</body>
+</html>
