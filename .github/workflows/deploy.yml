@@ -1,0 +1,59 @@
+# workflow 文件名就是流程的名字，可以任意取，建议用英文
+name: Deploy to GitHub Pages
+
+# ─── 触发条件（event）───────────────────────────────
+# on 下面声明什么情况下触发这套流程
+on:
+  push:                    # 当有人 push 代码时
+    branches: [main]       # 且是推送到 main 分支
+
+# ─── 权限声明 ───────────────────────────────────────
+# 告诉 GitHub 这台临时服务器有哪些权限：
+#   contents: read  可以读仓库内容（下载代码）
+#   pages: write    可以写 Pages（部署的权限）
+#   id-token: write  允许签发部署用的一次性令牌
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# ─── 并发控制 ───────────────────────────────────────
+# 如果连续 push 两次，后一次会自动取消前一次还没跑完的，
+# 避免两次部署同时进行产生冲突
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+# ─── 任务（job）─────────────────────────────────────
+jobs:
+  # 第一个 job：build —— 把网站打包成"货物"
+  build:
+    runs-on: ubuntu-latest   # 指定跑在 Linux 服务器上（runner）
+    steps:
+      # ① 下载你的仓库代码到这台服务器
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ② 让服务器知道这套 Pages 环境的配置
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      # ③ 把当前目录（含 index.html 等所有文件）打包上传成 artifact
+      #    artifact 是步骤之间传递的"货物"
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  # 第二个 job：deploy —— 把"货物"送货上线
+  deploy:
+    needs: build          # 依赖 build job：build 成功后才运行
+    runs-on: ubuntu-latest
+    environment:          # 绑定 Pages 环境，会在网址栏显示线上地址
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # ④ 部署 artifact 到 Pages，网站立即上线
+      - name: Deploy to GitHub Pages
+        id: deployment    # 给这一步起个代号，方便上面引用它的输出
+        uses: actions/deploy-pages@v4
